@@ -83,8 +83,9 @@ news_corpus_org_temp = news_corpus_org_temp[news_corpus_org_temp.Content != ''] 
 news_corpus_org_temp = news_corpus_org_temp.drop_duplicates()
 
 org_news_dict = news_corpus_org_temp.Content.to_dict()
+del news_corpus_org['Content']
+news_corpus_org['Content'] = news_corpus_org.index
 news_corpus_org = news_corpus_org.replace(org_news_dict)
-
 news_corpus_org = news_corpus_org.reset_index(drop=True)
 
 news_corpus_org
