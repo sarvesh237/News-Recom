@@ -36,13 +36,12 @@ from sklearn.decomposition import TruncatedSVD# TruncatedSVD
 from sklearn.decomposition import LatentDirichletAllocation
 
 """# **Importing the collected data**"""
-print("downloading data")
 
-df_1 = pd.read_csv("agrima_news_data.csv")
-df_2 = pd.read_csv("sarvesh_news_data.csv")
-df_3 = pd.read_csv("satender_news_data.csv")
-df_4 = pd.read_csv("vishal_news_data.csv")
-print("done downloading data")
+df_1 = pd.read_csv("https://github.com/sarvesh237/NewsRecommenderIDC401/raw/master/agrima_news_data.csv")
+df_2 = pd.read_csv("https://github.com/sarvesh237/NewsRecommenderIDC401/raw/master/sarvesh_news_data.csv")
+df_3 = pd.read_csv("https://github.com/sarvesh237/NewsRecommenderIDC401/raw/master/satender_news_data.csv")
+df_4 = pd.read_csv("https://github.com/sarvesh237/NewsRecommenderIDC401/raw/master/vishal_news_data.csv")
+
 """# **Preprocessing the csv files.**"""
 
 del df_1['Unnamed: 0']
@@ -68,6 +67,26 @@ stop_words = stopwords.words('english')
 stop_words.extend(['span','class','spacing','href','html','http','title','said','that'])
 news_corpus['Content'] = news_corpus['Content'].apply(lambda x: ' '.join([w for w in x.split() if len(w)>3]))
 news_corpus = news_corpus.apply(lambda x: [item for item in x if item not in stop_words])
+
+"""Storing a second news corpus to show the original news without preprocessing."""
+
+news_corpus_org = pd.concat([df_1,df_2,df_3,df_4],ignore_index=True)
+news_corpus_org = news_corpus_org.dropna() #dropping NaN
+news_corpus_org = news_corpus_org[news_corpus_org.Content != ''] #dropping empty rows
+news_corpus_org = news_corpus_org.drop_duplicates()
+news_corpus_org["Content"] = news_corpus_org['Content'].str.replace('[^\w\s]',' ')
+news_corpus_org = news_corpus_org[news_corpus_org['Content'].map(lambda x: x.isascii())]
+
+news_corpus_org_temp = pd.concat([df_1,df_2,df_3,df_4],ignore_index=True)
+news_corpus_org_temp = news_corpus_org_temp.dropna() #dropping NaN
+news_corpus_org_temp = news_corpus_org_temp[news_corpus_org_temp.Content != ''] #dropping empty rows
+news_corpus_org_temp = news_corpus_org_temp.drop_duplicates()
+
+org_news_dict = news_corpus_org_temp.Content.to_dict()
+news_corpus_org = news_corpus_org.replace(org_news_dict)
+news_corpus_org = news_corpus_org.reset_index(drop=True)
+
+news_corpus_org
 
 """**Lemmatization**"""
 
@@ -145,7 +164,7 @@ for index, component in enumerate(sv_dec.components_):
     zipped = zip(terms, component)
     top_terms_key=sorted(zipped, key = lambda t: t[1], reverse=True)[:10]
     top_terms_list=list(dict(top_terms_key).keys())
-    #print("Topic "+str(index)+": ",top_terms_list)
+    print("Topic "+str(index)+": ",top_terms_list)
 del Sigma,V_transpose,terms,zipped,top_terms_key
 
 """# **LDA : Latent Dirichlet Allocation**"""
@@ -178,7 +197,7 @@ def plot_top_words(model, feature_names, n_top_words, title):
 
     plt.subplots_adjust(top=0.90, bottom=0.05, wspace=0.90, hspace=0.3)
     plt.show()
-
+'''
 #plot_top_words(lda, feature_names, 10, "t")
 
 col = []
@@ -192,7 +211,7 @@ topic_df_2["Docs"] = news_corpus.Content
 l = ["Docs"]
 for i in col:
     l.append(i)
-'''
+
 #display(topic_df_2[l])
 
 """**Cosine Similarity**"""
@@ -276,11 +295,15 @@ def content_recommender(rank_matrix,cos_sim):
   selected_docs_with_ID = pd.concat([selected_docs_1,selected_docs_2],axis=1,ignore_index=True)
 
   #replace value by the actual news
-  doc_dict = news_corpus.Content.to_dict()
+  doc_dict = news_corpus_org.Content.to_dict()
 
   selected_docs = selected_docs_with_ID.replace(doc_dict)
   return selected_docs, selected_docs_with_ID
 
+"""# **Top 10 news : Content based recommender.**"""
+
+selected_docs_content,selected_docs_content_with_ID = content_recommender(rank_matrix,cos_sim)
+selected_docs_content
 
 """# **Collaborative recommender function: Predict missing ratings using Matrix factorization**"""
 
@@ -323,7 +346,7 @@ def collaborative_recommender(rank_matrix,num_iter,news_corpus):
       WH = np.dot(W, H)
       c = cost(A, W, H)
       #if i%num_display_cost==0:
-      #print(i, c)
+      print(i, c)
   W = pd.DataFrame(W)
   H = pd.DataFrame(H)
   A = W.dot(H)
@@ -333,12 +356,17 @@ def collaborative_recommender(rank_matrix,num_iter,news_corpus):
   A = np.clip(A,1,10)
   #finding the top 10 documents
   selected_docs_with_ID = A.apply(lambda s, n: pd.Series(s.nlargest(n).index), axis=1, n=10)
-  selected_docs_with_ID.columns =['D1', 'D2', 'D3', 'D4', 'D5','D6','D7','D8','D9','D10']
-  doc_dict = news_corpus.Content.to_dict()
+  selected_docs_with_ID.columns =['1', '2', '3', '4', '5','6','7','8','9','10']
+  doc_dict = news_corpus_org.Content.to_dict()
   selected_docs = selected_docs_with_ID.replace(doc_dict)
   return selected_docs, selected_docs_with_ID
 
+"""# **Top 10 news : Collaborative recommender.**"""
+
 num_iter = 10
+selected_docs_collab,selected_docs_collab_with_ID = collaborative_recommender(rank_matrix,num_iter,news_corpus)
+selected_docs_collab
+
 """# **Hydrid recommender**"""
 
 def hybrid(collaborative_recommender,content_recommender,rank_matrix,cos_sim,news_corpus):
@@ -361,15 +389,12 @@ def hybrid(collaborative_recommender,content_recommender,rank_matrix,cos_sim,new
 selected_docs_final,selected_docs_final_with_ID = hybrid(collaborative_recommender,content_recommender,rank_matrix,cos_sim,news_corpus)
 selected_docs_final
 
-"""# **User Profile Updater**"""
+"""# **User Profile Updater**
 
-def user_profile_updater(userid,articles_read,time_spent,rank_matrix):
-  #updated code here
-  
-  rank_matrix = updated_rank_matrix
-  return updated_rank_matrix
+Implemented in the flask app.
 
-"""# **Implement ALS based matrix factorization instead of NNLS**"""
+# **Implement ALS based matrix factorization instead of NNLS**
+"""
 
 '''from pyspark.ml.recommendation import ALS 
 from pyspark.sql.types import FloatType
