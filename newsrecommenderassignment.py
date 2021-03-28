@@ -37,10 +37,10 @@ from sklearn.decomposition import LatentDirichletAllocation
 
 """# **Importing the collected data**"""
 
-df_1 = pd.read_csv("https://github.com/sarvesh237/NewsRecommenderIDC401/raw/master/agrima_news_data.csv")
-df_2 = pd.read_csv("https://github.com/sarvesh237/NewsRecommenderIDC401/raw/master/sarvesh_news_data.csv")
-df_3 = pd.read_csv("https://github.com/sarvesh237/NewsRecommenderIDC401/raw/master/satender_news_data.csv")
-df_4 = pd.read_csv("https://github.com/sarvesh237/NewsRecommenderIDC401/raw/master/vishal_news_data.csv")
+df_1 = pd.read_csv("agrima_news_data.csv")
+df_2 = pd.read_csv("sarvesh_news_data.csv")
+df_3 = pd.read_csv("satender_news_data.csv")
+df_4 = pd.read_csv("vishal_news_data.csv")
 
 """# **Preprocessing the csv files.**"""
 
@@ -197,7 +197,7 @@ def plot_top_words(model, feature_names, n_top_words, title):
 
     plt.subplots_adjust(top=0.90, bottom=0.05, wspace=0.90, hspace=0.3)
     plt.show()
-'''
+
 #plot_top_words(lda, feature_names, 10, "t")
 
 col = []
@@ -211,7 +211,7 @@ topic_df_2["Docs"] = news_corpus.Content
 l = ["Docs"]
 for i in col:
     l.append(i)
-
+'''
 #display(topic_df_2[l])
 
 """**Cosine Similarity**"""
