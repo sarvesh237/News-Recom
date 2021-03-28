@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<form action = "http://localhost:5000/result" method = "POST">
+         <p>Time <input id="seconds-spent" type ="text" name = "Time spent" size="6" readonly="" /></p>
+         <p><input type = "submit" value = "Go back" /></p>
+</form>
+
+<script>
+(function(){"use strict";
+var secondsSpentElement = document.getElementById("seconds-spent");
+
+requestAnimationFrame(function updateTimeSpent(){
+    var timeNow = performance.now();
+    
+    secondsSpentElement.value = round(timeNow/1000);
+    
+    requestAnimationFrame(updateTimeSpent);
+});
+var performance = window.performance, round = Math.round;
+})();
+</script>
+
+<body>
+<p>{{news_body}}</p>
+</body>
+</html> 
