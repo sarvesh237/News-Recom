@@ -145,13 +145,13 @@ for index, component in enumerate(sv_dec.components_):
     zipped = zip(terms, component)
     top_terms_key=sorted(zipped, key = lambda t: t[1], reverse=True)[:10]
     top_terms_list=list(dict(top_terms_key).keys())
-    print("Topic "+str(index)+": ",top_terms_list)
+    #print("Topic "+str(index)+": ",top_terms_list)
 del Sigma,V_transpose,terms,zipped,top_terms_key
 
 """# **LDA : Latent Dirichlet Allocation**"""
 
 #lda
-
+'''
 lda = LatentDirichletAllocation(n_components=25)
 lda_matrix = lda.fit_transform(df_vecs)
 lda_topics = lda.fit(df_vecs)
@@ -192,7 +192,7 @@ topic_df_2["Docs"] = news_corpus.Content
 l = ["Docs"]
 for i in col:
     l.append(i)
-
+'''
 #display(topic_df_2[l])
 
 """**Cosine Similarity**"""
@@ -281,10 +281,6 @@ def content_recommender(rank_matrix,cos_sim):
   selected_docs = selected_docs_with_ID.replace(doc_dict)
   return selected_docs, selected_docs_with_ID
 
-"""# **Top 10 news : Content based recommender.**"""
-
-selected_docs_content,selected_docs_content_with_ID = content_recommender(rank_matrix,cos_sim)
-selected_docs_content
 
 """# **Collaborative recommender function: Predict missing ratings using Matrix factorization**"""
 
@@ -327,7 +323,7 @@ def collaborative_recommender(rank_matrix,num_iter,news_corpus):
       WH = np.dot(W, H)
       c = cost(A, W, H)
       #if i%num_display_cost==0:
-      print(i, c)
+      #print(i, c)
   W = pd.DataFrame(W)
   H = pd.DataFrame(H)
   A = W.dot(H)
@@ -342,12 +338,7 @@ def collaborative_recommender(rank_matrix,num_iter,news_corpus):
   selected_docs = selected_docs_with_ID.replace(doc_dict)
   return selected_docs, selected_docs_with_ID
 
-"""# **Top 10 news : Collaborative recommender.**"""
-
 num_iter = 10
-selected_docs_collab,selected_docs_collab_with_ID = collaborative_recommender(rank_matrix,num_iter,news_corpus)
-selected_docs_collab
-
 """# **Hydrid recommender**"""
 
 def hybrid(collaborative_recommender,content_recommender,rank_matrix,cos_sim,news_corpus):
