@@ -84,6 +84,7 @@ news_corpus_org_temp = news_corpus_org_temp.drop_duplicates()
 
 org_news_dict = news_corpus_org_temp.Content.to_dict()
 news_corpus_org = news_corpus_org.replace(org_news_dict)
+
 news_corpus_org = news_corpus_org.reset_index(drop=True)
 
 news_corpus_org
@@ -302,8 +303,8 @@ def content_recommender(rank_matrix,cos_sim):
 
 """# **Top 10 news : Content based recommender.**"""
 
-selected_docs_content,selected_docs_content_with_ID = content_recommender(rank_matrix,cos_sim)
-selected_docs_content
+#selected_docs_content,selected_docs_content_with_ID = content_recommender(rank_matrix,cos_sim)
+#selected_docs_content
 
 """# **Collaborative recommender function: Predict missing ratings using Matrix factorization**"""
 
@@ -364,8 +365,8 @@ def collaborative_recommender(rank_matrix,num_iter,news_corpus):
 """# **Top 10 news : Collaborative recommender.**"""
 
 num_iter = 10
-selected_docs_collab,selected_docs_collab_with_ID = collaborative_recommender(rank_matrix,num_iter,news_corpus)
-selected_docs_collab
+#selected_docs_collab,selected_docs_collab_with_ID = collaborative_recommender(rank_matrix,num_iter,news_corpus)
+#selected_docs_collab
 
 """# **Hydrid recommender**"""
 

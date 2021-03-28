@@ -6,11 +6,18 @@ app = Flask(__name__)
 output_list=[]
 user_id=0
 k=0
+counter_var = 0
+counter_var_2 = 0
 #updated_ratings = [0]*10
 @app.route('/')
 def home():
-    newsrecommenderassignment.selected_docs_final,newsrecommenderassignment.selected_docs_final_with_ID = newsrecommenderassignment.hybrid(newsrecommenderassignment.collaborative_recommender,newsrecommenderassignment.content_recommender,newsrecommenderassignment.rank_matrix,newsrecommenderassignment.cos_sim,newsrecommenderassignment.news_corpus)
+    #don't want to run this for the first time
+    global counter_var
+    if counter_var == 1:
+        newsrecommenderassignment.selected_docs_final,newsrecommenderassignment.selected_docs_final_with_ID = newsrecommenderassignment.hybrid(newsrecommenderassignment.collaborative_recommender,newsrecommenderassignment.content_recommender,newsrecommenderassignment.rank_matrix,newsrecommenderassignment.cos_sim,newsrecommenderassignment.news_corpus)
+    counter_var = 1
     return render_template('index.html')
+
 @app.route('/predict',methods=['POST','GET'])
 def predict():
     float_features = [float(x) for x in request.form.values()]
@@ -31,7 +38,16 @@ def predict():
     output8 = newsrecommenderassignment.selected_docs_final.iloc[user_id,7]
     output9 = newsrecommenderassignment.selected_docs_final.iloc[user_id,8]
     output10 = newsrecommenderassignment.selected_docs_final.iloc[user_id,9]
-    return render_template('index.html', prediction_text=' {}...'.format(output[0:100]),prediction_text_2=' {}...'.format(output2[0:100]),prediction_text_3=' {}...'.format(output3[0:100]),prediction_text_4=' {}...'.format(output4[0:100]),prediction_text_5=' {}...'.format(output5[0:100]),prediction_text_6=' {}...'.format(output6[0:100]),prediction_text_7=' {}...'.format(output7[0:100]),prediction_text_8=' {}...'.format(output8[0:100]),prediction_text_9=' {}...'.format(output9[0:100]),prediction_text_10=' {}...'.format(output10[0:100]))
+    
+    #global counter_var_2
+    #if counter_var_2 == 0:
+        #text1 = ""
+        #text2 = ""
+        #counter_var_2 = 1
+    #else:
+    text1 = "Logged in as "
+    text2 = ": User "
+    return render_template('index.html', text1=text1,text2=text2,user_name = user_id,prediction_text=' {}...'.format(output[0:100]),prediction_text_2=' {}...'.format(output2[0:100]),prediction_text_3=' {}...'.format(output3[0:100]),prediction_text_4=' {}...'.format(output4[0:100]),prediction_text_5=' {}...'.format(output5[0:100]),prediction_text_6=' {}...'.format(output6[0:100]),prediction_text_7=' {}...'.format(output7[0:100]),prediction_text_8=' {}...'.format(output8[0:100]),prediction_text_9=' {}...'.format(output9[0:100]),prediction_text_10=' {}...'.format(output10[0:100]))
 
 @app.route('/news/<i>',methods=['POST', 'GET'])
 def news(i):
@@ -67,4 +83,4 @@ def result():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
